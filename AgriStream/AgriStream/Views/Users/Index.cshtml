@@ -1,0 +1,28 @@
+@model List<User>
+@{ ViewData["Title"] = "User Management"; }
+
+<h2 class="fw-bold my-3">User Management</h2>
+<div class="card shadow-sm border-0"><div class="card-body table-responsive">
+    <table class="table align-middle">
+        <thead><tr><th>Username</th><th>Role</th><th>Created (UTC)</th><th>Change role</th></tr></thead>
+        <tbody>
+        @foreach (var u in Model)
+        {
+            <tr>
+                <td>@u.Username</td>
+                <td><span class="badge bg-success">@u.Role</span></td>
+                <td>@u.CreatedAt.ToString("yyyy-MM-dd HH:mm")</td>
+                <td>
+                    <form asp-action="ChangeRole" method="post" class="d-flex gap-2">
+                        <input type="hidden" name="id" value="@u.UserId" />
+                        <select name="role" class="form-select form-select-sm w-auto">
+                            @foreach (var r in Roles.All) { <option value="@r" selected="@(r == u.Role)">@r</option> }
+                        </select>
+                        <button class="btn btn-sm btn-outline-success">Save</button>
+                    </form>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div></div>

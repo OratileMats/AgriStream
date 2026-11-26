@@ -1,0 +1,47 @@
+@model List<Device>
+@{ ViewData["Title"] = "Devices & Irrigation"; }
+
+<div class="d-flex justify-content-between align-items-center my-3">
+    <div>
+        <h2 class="fw-bold">Devices &amp; Irrigation</h2>
+        <p class="text-muted mb-0">Commands go: MVC → HTTP POST function → Storage Queue → queue function → Azure SQL.</p>
+    </div>
+    @if (User.IsInRole("Admin") || User.IsInRole("Agronomist"))
+    {
+        <form asp-action="Simulate" method="post">
+            <button class="btn btn-outline-success">Simulate readings</button>
+        </form>
+    }
+</div>
+
+<div class="card shadow-sm border-0">
+    <div class="card-body table-responsive">
+        <table class="table table-hover align-middle">
+            <thead><tr><th>Device</th><th>Name</th><th>Farm</th><th>Status</th><th>Last command</th><th>Updated (UTC)</th><th></th></tr></thead>
+            <tbody>
+            @foreach (var d in Model)
+            {
+                <tr>
+                    <td>@d.DeviceId</td><td>@d.Name</td><td>@d.FarmName</td>
+                    <td><span class="badge @(d.Status == "Irrigating" ? "bg-primary" : "bg-secondary")">@d.Status</span></td>
+                    <td class="small text-muted">@d.LastCommand</td>
+                    <td class="small">@d.LastUpdated.ToString("yyyy-MM-dd HH:mm:ss")</td>
+                    <td class="text-end">
+                        <form asp-action="Irrigate" method="post" class="d-inline">
+                            <input type="hidden" name="deviceId" value="@d.DeviceId" />
+                            <input type="hidden" name="action" value="Start" />
+                            <button class="btn btn-sm btn-success">Trigger Irrigation</button>
+                        </form>
+                        <form asp-action="Irrigate" method="post" class="d-inline">
+                            <input type="hidden" name="deviceId" value="@d.DeviceId" />
+                            <input type="hidden" name="action" value="Stop" />
+                            <button class="btn btn-sm btn-outline-secondary">Stop</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+        <p class="small text-muted mb-0">Refresh the page after a few seconds to see the status change once the queue function has processed the command.</p>
+    </div>
+</div>

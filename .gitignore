@@ -1,0 +1,38 @@
+
+# Visual Studio files
+.vs/
+*.user
+*.suo
+
+# Build files
+bin/
+obj/
+publish/
+
+# Application settings containing secrets
+**/appsettings.json
+**/appsettings.*.json
+!**/appsettings.example.json
+
+# Azure Functions local settings
+local.settings.json
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# Certificates and keys
+*.pfx
+*.p12
+*.key
+
+# Logs
+*.log
+
+
+# Visual Studio Azure deployment credentials
+**/Properties/PublishProfiles/
+*.pubxml
+*.pubxml.user
+*.publishsettings

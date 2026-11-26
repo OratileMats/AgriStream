@@ -1,0 +1,56 @@
+@model MediaViewModel
+@{ ViewData["Title"] = "Drone Media"; }
+
+<h2 class="fw-bold my-3">Drone Image Management</h2>
+
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-body">
+        <h5 class="fw-bold">Upload aerial image</h5>
+        <form asp-action="Upload" method="post" enctype="multipart/form-data" class="row g-3 align-items-end">
+            <div class="col-md-4">
+                <label class="form-label">Farm</label>
+                <select name="farm" class="form-select">
+                    @foreach (var f in Model.Farms) { <option>@f</option> }
+                </select>
+            </div>
+            <div class="col-md-5">
+                <label class="form-label">Image (JPEG / PNG / TIFF / WebP, max 50 MB)</label>
+                <input type="file" name="file" class="form-control" accept="image/*" required />
+            </div>
+            <div class="col-md-3"><button class="btn btn-success w-100">Upload to Blob Storage</button></div>
+        </form>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    @foreach (var img in Model.Images)
+    {
+        <div class="col-sm-6 col-lg-3">
+            <div class="card shadow-sm border-0 h-100">
+                <a href="@img.Url" target="_blank"><img src="@img.Url" class="card-img-top gallery-img" alt="@img.Name" loading="lazy" /></a>
+                <div class="card-body p-2">
+                    <div class="small fw-semibold text-truncate" title="@img.Name">@img.Name</div>
+                    <div class="small text-muted">@img.Farm · @img.UploadedBy · @((img.SizeBytes / 1024.0 / 1024.0).ToString("0.0")) MB</div>
+                </div>
+            </div>
+        </div>
+    }
+    @if (!Model.Images.Any()) { <p class="text-muted">No images uploaded yet.</p> }
+</div>
+
+<div class="card shadow-sm border-0">
+    <div class="card-header bg-white"><h5 class="mb-0 fw-bold">Processing status audit <small class="text-muted fw-normal">(written by the Blob-triggered function to Table Storage)</small></h5></div>
+    <div class="card-body table-responsive">
+        <table class="table table-sm">
+            <thead><tr><th>Blob</th><th>Farm</th><th>Uploaded by</th><th>Size</th><th>Status</th><th>Processed</th></tr></thead>
+            <tbody>
+            @foreach (var a in Model.Audit)
+            {
+                <tr><td>@a.BlobName</td><td>@a.Farm</td><td>@a.UploadedBy</td><td>@((a.SizeBytes / 1024.0).ToString("N0")) KB</td>
+                    <td><span class="badge bg-success">@a.Status</span></td><td>@(a.ProcessedAt?.ToString("yyyy-MM-dd HH:mm:ss"))</td></tr>
+            }
+            @if (!Model.Audit.Any()) { <tr><td colspan="6" class="text-muted">No audit entries yet.</td></tr> }
+            </tbody>
+        </table>
+    </div>
+</div>
